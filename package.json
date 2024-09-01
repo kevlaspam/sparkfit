@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "netlify-build": "next build"
+    "netlify-build": "next build",
+    "postinstall": "npm install ws"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
@@ -24,14 +25,14 @@
     "html-to-image": "^1.11.11",
     "lucide-react": "^0.437.0",
     "next": "14.2.7",
-    "next-on-netlify": "^3.0.1",
+    "next-on-netlify": "^2.7.2",
     "openai": "^4.57.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hot-toast": "^2.4.1",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "ws": "^8.0.0"
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/node": "^20",
