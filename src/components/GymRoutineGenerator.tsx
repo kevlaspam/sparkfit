@@ -60,7 +60,7 @@ export default function GymRoutineGenerator() {
   }, [workoutLocation, workoutType])
 
   const generateWorkoutPlan = async () => {
-    setIsGenerating(true)
+    setIsGenerating(true);
     try {
       const response = await fetch('/api/generate-workout', {
         method: 'POST',
@@ -68,7 +68,6 @@ export default function GymRoutineGenerator() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name,
           fitnessLevel,
           fitnessGoal,
           workoutType,
@@ -80,25 +79,27 @@ export default function GymRoutineGenerator() {
           intensity,
           restPreference,
         }),
-      })
-
+      });
+  
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to generate workout plan')
+        throw new Error('Failed to generate workout plan');
       }
-
-      const data = await response.json()
-      console.log("Received workout plan:", data)
-      setWorkoutPlan(data)
-      toast.success('Workout plan generated successfully!')
-    } catch (error) {
-      console.error('Error generating workout plan:', error)
-      toast.error(`Failed to generate workout plan: ${error.message}`)
+  
+      const data = await response.json();
+      setWorkoutPlan(data);
+      toast.success('Workout plan generated successfully!');
+    } catch (error: unknown) {
+      console.error('Error generating workout plan:', error);
+      if (error instanceof Error) {
+        toast.error(`Failed to generate workout plan: ${error.message}`);
+      } else {
+        toast.error('An unknown error occurred while generating the workout plan');
+      }
     } finally {
-      setIsGenerating(false)
+      setIsGenerating(false);
     }
-  }
-
+  };
+  
   const takeScreenshot = async () => {
     if (workoutPlanRef.current) {
       try {
