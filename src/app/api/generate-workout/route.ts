@@ -86,8 +86,12 @@ export async function POST(request: Request) {
     console.log("Parsed Workout Plan:", workoutPlan)
 
     return NextResponse.json(workoutPlan)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error generating workout plan:', error)
-    return NextResponse.json({ message: 'Error generating workout plan', error: error.message }, { status: 500 })
+    if (error instanceof Error) {
+      return NextResponse.json({ message: 'Error generating workout plan', error: error.message }, { status: 500 })
+    } else {
+      return NextResponse.json({ message: 'An unknown error occurred' }, { status: 500 })
+    }
   }
 }
