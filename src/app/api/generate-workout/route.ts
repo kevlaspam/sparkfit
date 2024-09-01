@@ -33,7 +33,34 @@ export async function POST(request: Request) {
     Intensity: ${intensity}
     Rest Preference: ${restPreference}
 
-    Please provide a structured workout plan including warm-up, main workout with exercises, sets, reps, and rest times, cool-down, hydration tips, and recommendations.`
+    Please provide a structured workout plan including warm-up, main workout with exercises, sets, reps, and rest times, cool-down, hydration tips, and recommendations. Return the response as a JSON object with the following structure:
+    {
+      "type": string,
+      "level": string,
+      "goal": string,
+      "duration": number,
+      "intensity": string,
+      "preference": string,
+      "focusAreas": string[],
+      "warmup": {
+        "duration": number,
+        "exercises": string[]
+      },
+      "mainWorkout": [
+        {
+          "name": string,
+          "sets": number,
+          "reps": number,
+          "rest": string
+        }
+      ],
+      "cooldown": {
+        "duration": number,
+        "exercises": string[]
+      },
+      "hydrationTips": string[],
+      "recommendations": string[]
+    }`
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
@@ -42,20 +69,29 @@ export async function POST(request: Request) {
     })
 
     const content = completion.choices[0].message.content
+    console.log("OpenAI API Response:", content)
 
     if (!content) {
       throw new Error('No content received from OpenAI')
     }
 
-    // Instead of parsing JSON, we'll return the raw content
-    return NextResponse.json({ workoutPlan: content })
+    let workoutPlan
+    try {
+      workoutPlan = JSON.parse(content)
+    } catch (error) {
+      console.error('Error parsing OpenAI response:', content)
+      throw new Error('Invalid response format from OpenAI')
+    }
 
+    console.log("Parsed Workout Plan:", workoutPlan)
+
+    return NextResponse.json(workoutPlan)
   } catch (error: unknown) {
     console.error('Error generating workout plan:', error)
     if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ message: 'Error generating workout plan', error: error.message }, { status: 500 })
     } else {
-      return NextResponse.json({ error: 'An unknown error occurred' }, { status: 500 })
+      return NextResponse.json({ message: 'An unknown error occurred' }, { status: 500 })
     }
   }
 }
