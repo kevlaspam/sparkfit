@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import { auth } from '@/lib/firebase'
-import { db } from '@/lib/firebase'
+import { auth, storage, db } from '@/lib/firebase'
+import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 import { collection, addDoc } from 'firebase/firestore'
 
 const openai = new OpenAI({
@@ -79,26 +79,6 @@ export async function POST(req: Request) {
     })
 
     const mealPlan = response.choices[0].message.content
-
-    // Save the meal plan to Firestore if user is authenticated
-    const user = auth.currentUser;
-    if (user) {
-      await addDoc(collection(db, 'plans'), {
-        userId: user.uid,
-        type: 'meal',
-        plan: mealPlan,
-        name,
-        calories,
-        dietGoal,
-        dietType,
-        mealTypes,
-        cuisines,
-        likedFoods,
-        dislikedFoods,
-        allergies,
-        createdAt: new Date()
-      });
-    }
 
     return NextResponse.json({ mealPlan })
   } catch (error) {

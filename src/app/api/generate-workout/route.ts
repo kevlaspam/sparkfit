@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
-import { auth } from '@/lib/firebase'
-import { db } from '@/lib/firebase'
+import { auth, storage, db } from '@/lib/firebase'
+import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 import { collection, addDoc } from 'firebase/firestore'
 
 const openai = new OpenAI({
@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       workoutPreference,
       intensity,
       restPreference,
+      screenshotData, // New field for the screenshot data
     } = body
 
     const prompt = `Generate a detailed workout plan based on the following parameters:
@@ -92,28 +93,45 @@ export async function POST(request: Request) {
 
     console.log("Parsed Workout Plan:", workoutPlan)
 
-    // Save the workout plan to Firestore if user is authenticated
+    // Save the workout plan and screenshot to Firebase if user is authenticated
     const user = auth.currentUser;
-    if (user) {
-      await addDoc(collection(db, 'plans'), {
-        userId: user.uid,
-        type: 'workout',
-        plan: workoutPlan,
-        fitnessLevel,
-        fitnessGoal,
-        workoutType,
-        selectedFocusAreas,
-        workoutLocation,
-        selectedEquipment,
-        workoutDuration,
-        workoutPreference,
-        intensity,
-        restPreference,
-        createdAt: new Date()
-      });
+    let imageUrl = null;
+
+    if (user && screenshotData) {
+      try {
+        // Upload screenshot to Firebase Storage
+        const storageRef = ref(storage, `screenshots/${user.uid}/${Date.now()}.png`);
+        await uploadString(storageRef, screenshotData, 'data_url');
+        imageUrl = await getDownloadURL(storageRef);
+
+        // Save metadata to Firestore
+        await addDoc(collection(db, 'plans'), {
+          userId: user.uid,
+          type: 'workout',
+          plan: workoutPlan,
+          imageUrl: imageUrl,
+          fitnessLevel,
+          fitnessGoal,
+          workoutType,
+          selectedFocusAreas,
+          workoutLocation,
+          selectedEquipment,
+          workoutDuration,
+          workoutPreference,
+          intensity,
+          restPreference,
+          createdAt: new Date()
+        });
+
+        console.log("Workout plan and screenshot saved successfully");
+      } catch (e) {
+        console.error("Error saving workout plan and screenshot: ", e);
+      }
+    } else {
+      console.log("No user authenticated or no screenshot data, skipping save to Firebase");
     }
 
-    return NextResponse.json(workoutPlan)
+    return NextResponse.json({ workoutPlan, imageUrl })
   } catch (error: unknown) {
     console.error('Error generating workout plan:', error)
     if (error instanceof Error) {
