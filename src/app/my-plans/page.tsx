@@ -6,11 +6,12 @@ import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface Plan {
   id: string;
   type: 'workout' | 'meal';
-  plan: any;
+  imageUrl: string;
   createdAt: Date;
 }
 
@@ -58,15 +59,23 @@ const MyPlans: React.FC = () => {
       {plans.length === 0 ? (
         <p>You haven't created any plans yet.</p>
       ) : (
-        <ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map(plan => (
-            <li key={plan.id} className="mb-4 p-4 bg-white/10 rounded-lg">
-              <h2 className="text-xl font-semibold">{plan.type === 'workout' ? 'Workout Plan' : 'Meal Plan'}</h2>
-              <p>Created on: {plan.createdAt.toLocaleDateString()}</p>
-              <pre className="mt-2 whitespace-pre-wrap">{JSON.stringify(plan.plan, null, 2)}</pre>
-            </li>
+            <div key={plan.id} className="border rounded-lg overflow-hidden">
+              <Image 
+                src={plan.imageUrl} 
+                alt={`${plan.type} plan`} 
+                width={500} 
+                height={300} 
+                layout="responsive"
+              />
+              <div className="p-4">
+                <h2 className="text-xl font-semibold">{plan.type === 'workout' ? 'Workout Plan' : 'Meal Plan'}</h2>
+                <p>Created on: {plan.createdAt.toLocaleDateString()}</p>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
