@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { auth } from '@/lib/firebase'
+import { db } from '@/lib/firebase'
+import { collection, addDoc } from 'firebase/firestore'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
 export async function POST(request: Request) {
+  if (!process.env.OPENAI_API_KEY) {
+    return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+  }
+
   try {
     const body = await request.json()
     const {
@@ -84,6 +91,27 @@ export async function POST(request: Request) {
     }
 
     console.log("Parsed Workout Plan:", workoutPlan)
+
+    // Save the workout plan to Firestore if user is authenticated
+    const user = auth.currentUser;
+    if (user) {
+      await addDoc(collection(db, 'plans'), {
+        userId: user.uid,
+        type: 'workout',
+        plan: workoutPlan,
+        fitnessLevel,
+        fitnessGoal,
+        workoutType,
+        selectedFocusAreas,
+        workoutLocation,
+        selectedEquipment,
+        workoutDuration,
+        workoutPreference,
+        intensity,
+        restPreference,
+        createdAt: new Date()
+      });
+    }
 
     return NextResponse.json(workoutPlan)
   } catch (error: unknown) {

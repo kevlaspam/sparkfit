@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { auth } from '@/lib/firebase'
+import { db } from '@/lib/firebase'
+import { collection, addDoc } from 'firebase/firestore'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
 
 export async function POST(req: Request) {
+  if (!process.env.OPENAI_API_KEY) {
+    return NextResponse.json({ error: 'OpenAI API key not configured' }, { status: 500 });
+  }
+
   try {
     const body = await req.json()
     const {
@@ -72,6 +79,26 @@ export async function POST(req: Request) {
     })
 
     const mealPlan = response.choices[0].message.content
+
+    // Save the meal plan to Firestore if user is authenticated
+    const user = auth.currentUser;
+    if (user) {
+      await addDoc(collection(db, 'plans'), {
+        userId: user.uid,
+        type: 'meal',
+        plan: mealPlan,
+        name,
+        calories,
+        dietGoal,
+        dietType,
+        mealTypes,
+        cuisines,
+        likedFoods,
+        dislikedFoods,
+        allergies,
+        createdAt: new Date()
+      });
+    }
 
     return NextResponse.json({ mealPlan })
   } catch (error) {
