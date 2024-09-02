@@ -5,10 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "lint": "next lint",
-    "netlify-build": "next build",
-    "postinstall": "npm install ws"
+    "heroku-postbuild": "npm run build"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -24,24 +23,15 @@
     "@swc/helpers": "^0.5.12",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "cookie": "^0.6.0",
-    "data-uri-to-buffer": "^6.0.2",
     "framer-motion": "^11.3.31",
-    "html-to-image": "^1.11.11",
-    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.437.0",
     "next": "^14.2.7",
-    "next-on-netlify": "^2.7.2",
     "openai": "^4.57.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-hot-toast": "^2.4.1",
-    "shell-quote": "^1.8.1",
-    "stacktrace-parser": "^0.1.10",
-    "styled-jsx": "^5.1.6",
+    "react-hook-form": "^7.51.1",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
-    "ws": "^8.18.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -52,8 +42,10 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
     "postcss": "^8.4.43",
-    "shadcn-ui": "^0.2.3",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

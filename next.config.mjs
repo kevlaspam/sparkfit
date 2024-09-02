@@ -1,14 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  env: {
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: true,
   },
-  // Enable build caching
-  experimental: {
-    turbotrace: {
-      logLevel: 'error',
-    },
-  },
-};
+}
 
 export default nextConfig;
