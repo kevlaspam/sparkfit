@@ -131,7 +131,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-center">
-                  Whether you're bulking, cutting, or maintaining, FitSpark adapts to your fitness objectives.
+                  Whether you&apos;re bulking, cutting, or maintaining, FitSpark adapts to your fitness objectives.
                 </p>
               </CardContent>
             </Card>
