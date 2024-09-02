@@ -57,7 +57,7 @@ const MyPlans: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">My Plans</h1>
       {plans.length === 0 ? (
-        <p>You haven't created any plans yet.</p>
+        <p>You haven&apos;t created any plans yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {plans.map(plan => (
